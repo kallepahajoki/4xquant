@@ -9,3 +9,8 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
 
 libraryDependencies += "com.typesafe.akka" % "akka-actor" % "2.0"
+
+
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
+)

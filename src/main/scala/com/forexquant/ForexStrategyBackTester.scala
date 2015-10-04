@@ -1,20 +1,23 @@
 package com.forexquant
 
-import akka.actor.{ActorSystem, Props}
-import com.forexquant.backtest.MarketHistoryDataReader
-import com.forexquant.market.CurrencyPair
+import com.forexquant.analysis.{MovingAverageAnalysis, TimeFrameGroupingAnalysis}
+import com.forexquant.backtest.{BacktestMarketDataService, MarketHistoryDataReader}
+import com.forexquant.market.constants.TickerSymbol
 import com.forexquant.strategy.service.StrategyService
+import com.forexquant.strategy.strategies.Simple5And8EMACrossOver
 
 object ForexStrategyBackTester extends App {
 
-  val system = ActorSystem("4XQuantSystem")
 
-  val strategyService = system.actorOf(Props[StrategyService], name = "strategyService")
+  val strategyService = new StrategyService
+  strategyService.registerAnalysis(new TimeFrameGroupingAnalysis(strategyService))
+  strategyService.registerAnalysis(new MovingAverageAnalysis(strategyService))
+  strategyService.registerStategy(new Simple5And8EMACrossOver(strategyService))
 
-  val rdr = new MarketHistoryDataReader("src/test/resources/quotes.txt")
+  val marketDataService = new BacktestMarketDataService(strategyService)
 
-  for (evt <- rdr.read(List(CurrencyPair.EURUSD))) {
-    strategyService ! evt
-  }
+  marketDataService.feed()
+
+
 
 }
