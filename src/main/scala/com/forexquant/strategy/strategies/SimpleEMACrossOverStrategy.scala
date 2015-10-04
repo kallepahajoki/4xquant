@@ -9,7 +9,7 @@ import com.forexquant.strategy.service.StrategyService
 /**
  * Created by kallepahajoki on 3.10.15.
  */
-class Simple5And8EMACrossOver(strategyService: StrategyService) extends Strategy(strategyService) {
+class SimpleEMACrossOverStrategy(strategyService: StrategyService) extends Strategy(strategyService) {
   override def indicators: List[(TimeFrame, TickerSymbol, String, Int)] = (TimeFrame.D1, TickerSymbol.EURUSD, "EMA", 20) ::(TimeFrame.D1, TickerSymbol.EURUSD, "EMA", 10) :: Nil
 
   var fasterPrevious: MarketEvent = null
@@ -17,6 +17,8 @@ class Simple5And8EMACrossOver(strategyService: StrategyService) extends Strategy
   var faster: MarketEvent = null
   var slower: MarketEvent = null
   var order: Order = null
+
+  val account = strategyService.marketService.openAccount("Simple EMA strategy")
 
   /**
    * Check whether the EMAs cross within the same hour
@@ -57,11 +59,11 @@ class Simple5And8EMACrossOver(strategyService: StrategyService) extends Strategy
       if (go) {
 
         if (order != null && order.active) {
-          strategyService.marketService.closeOrder(order)
+          strategyService.marketService.closeOrder(account, order)
         }
 
-        order = new Order(message.symbol, short, volume, message.dateTime, price, stopLoss, stopLimit, true)
-        strategyService.marketService.placeOrder(order)
+        order = new Order(message.symbol, short, volume, message.dateTime, price, stopLoss, stopLimit, true, price)
+        strategyService.marketService.placeOrder(account, order)
       }
     }
   }

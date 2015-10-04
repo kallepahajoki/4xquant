@@ -11,6 +11,8 @@ import scala.collection.mutable.ListBuffer
  */
 class MovingAverageAnalysis(context: StrategyService) extends Analysis(context) {
 
+  val previousEma: scala.collection.mutable.Map[TimeFrame, BigDecimal] = scala.collection.mutable.Map()
+
   override def process(event: BarEvent) = {
     var items = context.getWantedIndicatorsForEvent(event)
 
@@ -60,16 +62,26 @@ class MovingAverageAnalysis(context: StrategyService) extends Analysis(context) 
   def calculateSMA(queue: ListBuffer[BarEvent], window: Int): BigDecimal =
     queue.takeRight(window.asInstanceOf[Int]).map(x => x.close).reduceLeft((e1, e2) => e1 + e2) / window
 
-  def calculateEMA(queue: ListBuffer[BarEvent], window: Int, days: Int): BigDecimal = {
+  def calculateEMA(queue: ListBuffer[BarEvent], window: Int, days: Int, prev: BigDecimal): BigDecimal = {
     val k = (2.0 / (window + 1))
+
     if (queue.length == 1)
       queue.head.close
     else
-      (queue.last.close * k) + (1.0 - k) * calculateEMA(queue.dropRight(1), window, days - 1)
+      (queue.last.close * k) + (1.0 - k) * (if (prev > 0) prev else calculateEMA(queue.dropRight(1), window, days - 1, -1))
+  }
+
+  def calculateAndStoreEMA(timeFrame: TimeFrame, queue: ListBuffer[BarEvent], window: Int, days: Int, prev: BigDecimal): BigDecimal = {
+    var previous: BigDecimal = -1
+    if (previousEma.contains(timeFrame)) previous = previousEma(timeFrame)
+    val ema = calculateEMA(queue, window, window, previous)
+
+    previousEma(timeFrame) = ema
+    return ema
   }
 
   def calculateExponentialMovingAverage(event: BarEvent, queue: ListBuffer[BarEvent], window: Int, timeFrame: TimeFrame): IndicatorEvent = {
     //println("Calculating EMA" + window + " in timeframe " + timeFrame + " from " + queue.length + " events")
-    return new ExponentialMovingAverage(window, timeFrame, queue.head.symbol, event.dateTime, calculateEMA(queue, window, window))
+    return new ExponentialMovingAverage(window, timeFrame, queue.head.symbol, event.dateTime, calculateAndStoreEMA(timeFrame, queue, window, window, -1))
   }
 }

@@ -30,59 +30,59 @@ class MovingAverageAnalysisTest extends FunSuite {
 
   def assertEquals(decimal: BigDecimal, d: Double) = {
 
-    if(Math.abs(decimal.doubleValue()-d)>0.01) {
-      assert(false, "Expected "+d+" got "+decimal)
+    if (Math.abs(decimal.doubleValue() - d) > 0.01) {
+      assert(false, "Expected " + d + " got " + decimal)
     }
   }
 
   /**
-   Validated using data from http://www.dummies.com/how-to/content/how-to-calculate-exponential-moving-average-in-tra.html
-   */
-  test("Exponential Moving Average is calculated correctly") {
+  Validated using data from http://www.dummies.com/how-to/content/how-to-calculate-exponential-moving-average-in-tra.html
+    */
+  test("Exponential Moving Average is calculated correctly, with our without previous value") {
     val queue = new ListBuffer[BarEvent]
 
     queue += createEvent(22.81)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.81)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, -1), 22.81)
     queue += createEvent(23.09)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.87)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, -1), 22.87)
     queue += createEvent(22.91)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.87)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 22.87)
     queue += createEvent(23.23)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.95)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 22.95)
     queue += createEvent(22.83)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.92)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 22.92)
     queue += createEvent(23.05)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.95)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 22.95)
     queue += createEvent(23.02)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 22.96)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 22.96)
     queue += createEvent(23.29)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.03)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.03)
     queue += createEvent(23.41)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.10)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.10)
     queue += createEvent(23.49)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.18)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.18)
     queue += createEvent(24.60)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.47)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.47)
     queue += createEvent(24.63)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.70)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, -1), 23.70)
     queue += createEvent(24.51)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.86)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.86)
     queue += createEvent(23.73)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.83)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.83)
     queue += createEvent(23.31)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.73)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.73)
     queue += createEvent(23.53)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.69)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9,-1), 23.69)
     queue += createEvent(23.06)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.56)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9,-1), 23.56)
     queue += createEvent(23.25)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.50)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9,-1), 23.50)
     queue += createEvent(23.12)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.42)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.42)
     queue += createEvent(22.80)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.30)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.30)
     queue += createEvent(22.84)
-    assertEquals(avga.calculateEMA(queue, 9, 9) , 23.21)
+    assertEquals(avga.calculateAndStoreEMA(TimeFrame.H1, queue, 9, 9, avga.previousEma(TimeFrame.H1)), 23.21)
 
   }
 
